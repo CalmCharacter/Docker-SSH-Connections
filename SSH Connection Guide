@@ -1,0 +1,100 @@
+Docker Commands for this project:
+
+Goal: 1. setup ssh connections between two ubuntu containers in docker
+      2. configured ssh connections server and client in two ubuntu containers
+      3. Connection two containers using SSH Command
+
+Adding computer in docker group:
+sudo usermod -aG docker $USER
+newgrp docker
+
+checking your exisiting docker images:
+docker images
+
+Pulling image from Docker Hub:
+docker pull ubuntu
+
+Go to your directory where you want to put the container:
+cd "Docker Practice Projects"
+cd "SSH Connections 1"
+
+Check if you are in the directory you wish to were:
+pwd
+
+Running Docker Container with Image:
+docker run -it --name container1 ubuntu
+
+Prepare for package installation:
+apt-get update
+
+install ssh server package:
+apt-get install openssh-server
+
+install nano (a simple text edit notebook use to edit ssh config files) package:
+apt-get install nano
+
+edit ssh config files using nano notebook:
+nano /etc/ssh/sshd_config
+then uncomment and change - PermitRootLogin yes
+then ctrl+s to save, and ctrl+x to exit config file
+
+check the status of what services running:
+service --status-all
+
+then run ssh:
+service ssh start
+
+now exit
+
+create a second container
+docker run -it --name container2 ubuntu
+
+prepapre for package installion:
+apt-get update
+
+install ssh client package:
+apt-get instasll openssh-client
+
+now container1 and container2 installed ssh server and client package, in order to create ssh connection, we need to get password from the ssh server in container1
+
+exit to container2 and start the container 1:
+docker start Container 1
+
+then go to interaction mode in container 1 by typing this terminal:
+docker exec -it Container1 bash
+
+once inside the container1, check the ssh server password:
+cat /etc/shadow | grep root
+
+then we can see the root password, but we will set our own new password and not rely on this for secure authentication:
+passwd root
+then type password: 123
+and retyple password: 123
+
+now we know the password of our ssh server, we need to get the IP address of our container1 server:
+
+therefore we need to exit first in our container1,
+
+but before we exit we need to check first the status if SSH is running:
+service --status-all
+service ssh start
+
+then exit, 
+
+then type this to terminal to check container1 ipadress:
+docker inspect Container1 | grep IPAddress
+
+as we can see our IPAddress for container 1 is - 172.17.0.2
+
+after we know the IPAddress and password of our ssh server, we will go to the container 2 to connect to the ssh server:
+
+we need to start the container 2 by typing in the terminal:
+docker start Container2
+
+then go to interaction mode in container 2 by typing this in the terminal:
+docker exec -it Container2 bash
+
+now type this to connect to the ssh server:
+ssh roo@172.17.0.2
+type yes,
+and type password:123
